@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="stations">
+        <item>North Avenue</item>
+        <item>Quezon Avenue</item>
+        <item>GMA-Kamuning</item>
+        <item>Cubao</item>
+        <item>Santolan Anapolis</item>
+        <item>Ortigas Avenue</item>
+        <item>Shaw Boulevard</item>
+        <item>Boni Avenue</item>
+        <item>Guadalupe</item>
+        <item>Buendia</item>
+        <item>Ayala</item>
+        <item>Magallanes</item>
+        <item>Taft Avenue</item>
+    </string-array>
+
+</resources>

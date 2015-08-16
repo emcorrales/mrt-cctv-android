@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">MRT3 CCTV</string>
+    <string name="title_activity_main">MRT3 CCTV</string>
+
+    <string name="no_connection">Connection not available.</string>
+    <string name="no_cctv">CCTV currently not available.</string>
+
+</resources>
