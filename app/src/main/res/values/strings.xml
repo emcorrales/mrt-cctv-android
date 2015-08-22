@@ -7,4 +7,22 @@
     <string name="no_connection">Connection not available.</string>
     <string name="no_cctv">CCTV currently not available.</string>
 
+    <string name="nb_platfrom">NORTHBOUND PLATFORM</string>
+    <string name="nb_platfrom1">NORTHBOUND PLATFORM1</string>
+    <string name="nb_platfrom2">NORTHBOUND PLATFORM2</string>
+
+    <string name="sb_platfrom">SOUTHBOUND PLATFORM</string>
+    <string name="sb_platfrom1">SOUTHBOUND PLATFORM1</string>
+    <string name="sb_platfrom2">SOUTHBOUND PLATFORM2</string>
+
+    <string name="sb_ticketing">SOUTHBOUND TICKETING</string>
+    <string name="sb_ticketing1">SOUTHBOUND TICKETING1</string>
+    <string name="sb_ticketing2">SOUTHBOUND TICKETING2</string>
+
+    <string name="nb_ticketing">NORTHBOUND TICKETING</string>
+    <string name="nb_ticketing1">NORTHBOUND TICKETING1</string>
+    <string name="nb_ticketing2">NORTHBOUND TICKETING2</string>
+
+    <string name="ticketing1">TICKETING1</string>
+    <string name="ticketing2">TICKETING2</string>
 </resources>
