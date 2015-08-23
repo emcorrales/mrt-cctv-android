@@ -56,14 +56,10 @@ public class CctvFragment extends Fragment {
 
         @Override
         protected ResponseDetails doInBackground(Void... params) {
-            if (isConnected(getActivity())) {
-                try {
-                    return stream(mStationId, mCameraId);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            } else {
-                displayMessage(R.string.no_connection);
+            try {
+                return stream(getActivity(), mStationId, mCameraId);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
             return null;
         }
@@ -73,27 +69,32 @@ public class CctvFragment extends Fragment {
             super.onPostExecute(responseDetails);
             IS_STREAMING = false;
 
-            if (responseDetails != null) {
-                if (responseDetails.getImage() != null
-                        && responseDetails.getStationId() == mStationId
-                        && responseDetails.getCameraId() == mCameraId) {
+            //If has internet connection.
+            if (responseDetails != null && responseDetails.isConnected()) {
+                //if request was successful and the requested image is the same.
+                if (responseDetails.getResponseCode() == 200) {
+                    //If request hasn't changed while waiting for a response.
+                    if (responseDetails.getStationId() == mStationId
+                            && responseDetails.getCameraId() == mCameraId) {
+                        //If responded with an image.
+                        if (responseDetails.getImage() != null) {
+                            mCctvStatus.setVisibility(View.INVISIBLE);
+                            mProgressBar.setVisibility(View.INVISIBLE);
+                            mImage = responseDetails.getImage();
+                            mPreview.setImageBitmap(mImage);
 
-                    mCctvStatus.setVisibility(View.INVISIBLE);
-                    mProgressBar.setVisibility(View.INVISIBLE);
-                    mImage = responseDetails.getImage();
-                    mPreview.setImageBitmap(mImage);
-
-                } else if (responseDetails.getImage() != null
-                        && (responseDetails.getStationId() != mStationId
-                        || responseDetails.getCameraId() != mCameraId)) {
-                    mImage = null;
-                    mPreview.setImageBitmap(mImage);
-
-                } else {
-                    mImage = null;
-                    mPreview.setImageBitmap(mImage);
-                    displayMessage(R.string.no_cctv);
+                        } else { //If didn't respond with an image cctv might not be available.
+                            mImage = null;
+                            mPreview.setImageBitmap(mImage);
+                            displayMessage(R.string.no_cctv);
+                        }
+                    } else { //If the request has changed while waiting, keep loading.
+                        mImage = null;
+                        mPreview.setImageBitmap(mImage);
+                    }
                 }
+            } else { //If no internet connection.
+                displayMessage(R.string.no_connection);
             }
 
             if (isResumed()) {
@@ -118,7 +119,6 @@ public class CctvFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-
         if (mIsChangingOrientation) {
             if (mImage != null) {
                 mPreview.setImageBitmap(mImage);
@@ -145,7 +145,6 @@ public class CctvFragment extends Fragment {
         if (mCctvStatus != null) {
             mCctvStatusVisibility = mCctvStatus.getVisibility();
         }
-
         if (mProgressBar != null) {
             mProgressBarVisibility = mProgressBar.getVisibility();
         }
@@ -167,7 +166,6 @@ public class CctvFragment extends Fragment {
 
     private void clear() {
         displayProgressBar();
-
         if (mPreview != null) {
             mPreview.setImageBitmap(null);
         }
@@ -177,7 +175,6 @@ public class CctvFragment extends Fragment {
         if (mCctvStatus != null) {
             mCctvStatus.setVisibility(View.INVISIBLE);
         }
-
         if (mProgressBar != null) {
             mProgressBar.setVisibility(View.VISIBLE);
         }
@@ -210,29 +207,40 @@ public class CctvFragment extends Fragment {
         return false;
     }
 
-    public static ResponseDetails stream(int stationId, int cameraId) throws IOException {
-        InputStream is = null;
-        Bitmap bmp = null;
-        int responseCode;
+    public static ResponseDetails stream(Context context, int stationId, int cameraId)
+            throws IOException {
+        ResponseDetails responseDetails = new ResponseDetails(stationId, cameraId);
 
-        try {
-            URL url = new URL("http://api.pinoymobileapps.com/mrtcctv/?stationId=" + stationId + "&cameraId=" + cameraId);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.connect();
-            responseCode = conn.getResponseCode();
-            if (responseCode == 200) {
-                is = conn.getInputStream();
-                BufferedInputStream bufferedInputStream = new BufferedInputStream(is);
-                bmp = BitmapFactory.decodeStream(bufferedInputStream);
+        if (isConnected(context)) {
+
+            responseDetails.setIsConnected(true);
+            InputStream is = null;
+
+            try {
+                URL url = new URL("http://api.pinoymobileapps.com/mrtcctv/?stationId="
+                        + stationId + "&cameraId=" + cameraId);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.connect();
+
+                responseDetails.setResponseCode(conn.getResponseCode());
+                if (responseDetails.getResponseCode() == 200) {
+                    is = conn.getInputStream();
+                    BufferedInputStream bufferedInputStream = new BufferedInputStream(is);
+                    Bitmap image = BitmapFactory.decodeStream(bufferedInputStream);
+                    responseDetails.setImage(image);
+                }
+
+            } finally {
+                if (is != null) {
+                    is.close();
+                }
             }
 
-        } finally {
-            if (is != null) {
-                is.close();
-            }
+        } else {
+            responseDetails.setIsConnected(false);
         }
 
-        return new ResponseDetails(bmp, stationId, cameraId, responseCode);
+        return responseDetails;
     }
 
 

@@ -41,19 +41,15 @@ public class MainActivity extends AppCompatActivity {
     private static String NB_PLATFORM;
     private static String NB_PLATFORM1;
     private static String NB_PLATFORM2;
-
     private static String SB_PLATFORM;
     private static String SB_PLATFORM1;
     private static String SB_PLATFORM2;
-
     private static String NB_TICKETING;
     private static String NB_TICKETING1;
     private static String NB_TICKETING2;
-
     private static String SB_TICKETING;
     private static String SB_TICKETING1;
     private static String SB_TICKETING2;
-
     private static String TICKETING1;
     private static String TICKETING2;
 
@@ -154,7 +150,6 @@ public class MainActivity extends AppCompatActivity {
         TICKETING1 = getResources().getString(R.string.ticketing1);
         TICKETING2 = getResources().getString(R.string.ticketing2);
     }
-
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {

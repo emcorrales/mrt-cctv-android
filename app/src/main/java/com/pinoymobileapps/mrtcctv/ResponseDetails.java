@@ -8,28 +8,42 @@ class ResponseDetails {
     private int stationId;
     private int cameraId;
     private int responseCode;
+    private boolean isConnected = false;
 
-    public ResponseDetails(Bitmap image, int stationId, int cameraId, int responseCode) {
-        this.image = image;
+    ResponseDetails(int stationId, int cameraId) {
         this.stationId = stationId;
         this.cameraId = cameraId;
-        this.responseCode = responseCode;
     }
 
-
-    public Bitmap getImage() {
+    Bitmap getImage() {
         return image;
     }
 
-    public int getStationId() {
+    int getStationId() {
         return stationId;
     }
 
-    public int getCameraId() {
+    int getCameraId() {
         return cameraId;
     }
 
-    public int getResponseCode() {
+    int getResponseCode() {
         return responseCode;
+    }
+
+    void setImage(Bitmap image) {
+        this.image = image;
+    }
+
+    void setResponseCode(int responseCode) {
+        this.responseCode = responseCode;
+    }
+
+    boolean isConnected() {
+        return isConnected;
+    }
+
+    void setIsConnected(boolean isConnected) {
+        this.isConnected = isConnected;
     }
 }
