@@ -20,7 +20,6 @@ import butterknife.OnItemClick;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final String TAG = MainActivity.class.getSimpleName();
     private static final String KEY_STATION = "key_station";
     private static final String KEY_CAMERA = "key_camera";
 
@@ -37,21 +36,6 @@ public class MainActivity extends AppCompatActivity {
     private static final int AYALA = 10;
     private static final int MAGALLANES = 11;
     private static final int TAFT = 12;
-
-    private static String NB_PLATFORM;
-    private static String NB_PLATFORM1;
-    private static String NB_PLATFORM2;
-    private static String SB_PLATFORM;
-    private static String SB_PLATFORM1;
-    private static String SB_PLATFORM2;
-    private static String NB_TICKETING;
-    private static String NB_TICKETING1;
-    private static String NB_TICKETING2;
-    private static String SB_TICKETING;
-    private static String SB_TICKETING1;
-    private static String SB_TICKETING2;
-    private static String TICKETING1;
-    private static String TICKETING2;
 
     @Nullable
     @Bind(R.id.drawer_layout)
@@ -81,6 +65,25 @@ public class MainActivity extends AppCompatActivity {
     @Bind(R.id.button4)
     Button mButton4;
 
+    private String nbPlatform;
+    private String nbPlatform1;
+    private String nbPlatform2;
+
+    private String sbPlatform;
+    private String sbPlatform1;
+    private String sbPlatform2;
+
+    private String nbTicketing;
+    private String nbTicketing1;
+    private String nbTicketing2;
+
+    private String sbTicketing;
+    private String sbTicketing1;
+    private String sbTicketing2;
+
+    private String ticketing1;
+    private String ticketing2;
+
     private CctvFragment mCctvFragment;
     private String[] mStations;
     private int mCurrentStationId = 0;
@@ -93,35 +96,34 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
+        initStrings();
+        int stationId = NORTH_AVE;
+        int cameraId = 1;
+
+        if (savedInstanceState != null) {
+            stationId = savedInstanceState.getInt(KEY_STATION);
+            cameraId = savedInstanceState.getInt(KEY_CAMERA);
+        }
+
         if (mToolbar != null) {
             setSupportActionBar(mToolbar);
         }
 
         if (mDrawerLayout != null && mDrawerList != null) {
-            setupNavigationDrawer();
+            setupNavigationDrawer(stationId);
         }
 
         mCctvFragment = (CctvFragment) getSupportFragmentManager().findFragmentById(R.id.cctv);
-
-        if (savedInstanceState != null) {
-            int savedStationId = savedInstanceState.getInt(KEY_STATION);
-            int savedCameraId = savedInstanceState.getInt(KEY_CAMERA);
-
-            if (mCctvFragment != null) {
-                changeCamera(savedStationId, savedCameraId);
-            }
-
-        } else {
-            initStrings();
-            changeCamera(NORTH_AVE, 1);
+        if (mCctvFragment != null) {
+            changeCamera(stationId, cameraId);
         }
     }
 
-    private void setupNavigationDrawer() {
+    private void setupNavigationDrawer(int selectedIndex) {
         mStations = getResources().getStringArray(R.array.stations);
         if (mDrawerList != null) {
             mDrawerList.setAdapter(new ArrayAdapter<>(this, R.layout.item_drawer, mStations));
-            mDrawerList.setItemChecked(0, true);
+            mDrawerList.setItemChecked(selectedIndex, true);
         }
 
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, mToolbar, 0, 0);
@@ -131,24 +133,24 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initStrings() {
-        NB_PLATFORM = getResources().getString(R.string.nb_platfrom);
-        NB_PLATFORM1 = getResources().getString(R.string.nb_platfrom1);
-        NB_PLATFORM2 = getResources().getString(R.string.nb_platfrom2);
+        nbPlatform = getResources().getString(R.string.nb_platfrom);
+        nbPlatform1 = getResources().getString(R.string.nb_platfrom1);
+        nbPlatform2 = getResources().getString(R.string.nb_platfrom2);
 
-        SB_PLATFORM = getResources().getString(R.string.sb_platfrom);
-        SB_PLATFORM1 = getResources().getString(R.string.sb_platfrom1);
-        SB_PLATFORM2 = getResources().getString(R.string.sb_platfrom2);
+        sbPlatform = getResources().getString(R.string.sb_platfrom);
+        sbPlatform1 = getResources().getString(R.string.sb_platfrom1);
+        sbPlatform2 = getResources().getString(R.string.sb_platfrom2);
 
-        NB_TICKETING = getResources().getString(R.string.nb_ticketing);
-        NB_TICKETING1 = getResources().getString(R.string.nb_ticketing1);
-        NB_TICKETING2 = getResources().getString(R.string.nb_ticketing2);
+        nbTicketing = getResources().getString(R.string.nb_ticketing);
+        nbTicketing1 = getResources().getString(R.string.nb_ticketing1);
+        nbTicketing2 = getResources().getString(R.string.nb_ticketing2);
 
-        SB_TICKETING = getResources().getString(R.string.sb_ticketing);
-        SB_TICKETING1 = getResources().getString(R.string.sb_ticketing1);
-        SB_TICKETING2 = getResources().getString(R.string.sb_ticketing2);
+        sbTicketing = getResources().getString(R.string.sb_ticketing);
+        sbTicketing1 = getResources().getString(R.string.sb_ticketing1);
+        sbTicketing2 = getResources().getString(R.string.sb_ticketing2);
 
-        TICKETING1 = getResources().getString(R.string.ticketing1);
-        TICKETING2 = getResources().getString(R.string.ticketing2);
+        ticketing1 = getResources().getString(R.string.ticketing1);
+        ticketing2 = getResources().getString(R.string.ticketing2);
     }
 
     @Override
@@ -255,55 +257,55 @@ public class MainActivity extends AppCompatActivity {
 
         switch (mCurrentStationId) {
             case NORTH_AVE:
-                updateTextsOfButtons(SB_PLATFORM1, SB_PLATFORM2, SB_TICKETING1, SB_TICKETING2);
+                updateTextsOfButtons(sbPlatform1, sbPlatform2, sbTicketing1, sbTicketing2);
                 break;
 
             case QUEZON_AVE:
-                updateTextsOfButtons(NB_PLATFORM, NB_TICKETING, SB_PLATFORM, SB_TICKETING);
+                updateTextsOfButtons(nbPlatform, nbTicketing, sbPlatform, sbTicketing);
                 break;
 
             case KAMUNING:
-                updateTextsOfButtons(NB_PLATFORM, NB_TICKETING, SB_PLATFORM, SB_TICKETING);
+                updateTextsOfButtons(nbPlatform, nbTicketing, sbPlatform, sbTicketing);
                 break;
 
             case CUBAO:
-                updateTextsOfButtons(NB_PLATFORM, NB_TICKETING, SB_PLATFORM, SB_TICKETING);
+                updateTextsOfButtons(nbPlatform, nbTicketing, sbPlatform, sbTicketing);
                 break;
 
             case SANTOLAN:
-                updateTextsOfButtons(NB_PLATFORM, NB_TICKETING, SB_PLATFORM, SB_TICKETING);
+                updateTextsOfButtons(nbPlatform, nbTicketing, sbPlatform, sbTicketing);
                 break;
 
             case ORTIGAS:
-                updateTextsOfButtons(NB_PLATFORM, NB_TICKETING, SB_PLATFORM, SB_TICKETING);
+                updateTextsOfButtons(nbPlatform, nbTicketing, sbPlatform, sbTicketing);
                 break;
 
             case SHAW_BLVD:
-                updateTextsOfButtons(NB_PLATFORM, NB_TICKETING, SB_PLATFORM, SB_TICKETING);
+                updateTextsOfButtons(nbPlatform, nbTicketing, sbPlatform, sbTicketing);
                 break;
 
             case BONI:
-                updateTextsOfButtons(NB_PLATFORM, NB_TICKETING, SB_PLATFORM, SB_TICKETING);
+                updateTextsOfButtons(nbPlatform, nbTicketing, sbPlatform, sbTicketing);
                 break;
 
             case GUADALUPE:
-                updateTextsOfButtons(NB_PLATFORM, NB_TICKETING, SB_PLATFORM, SB_TICKETING);
+                updateTextsOfButtons(nbPlatform, nbTicketing, sbPlatform, sbTicketing);
                 break;
 
             case BUENDIA:
-                updateTextsOfButtons(NB_PLATFORM, TICKETING1, SB_PLATFORM, TICKETING2);
+                updateTextsOfButtons(nbPlatform, ticketing1, sbPlatform, ticketing2);
                 break;
 
             case AYALA:
-                updateTextsOfButtons(NB_PLATFORM, TICKETING1, SB_PLATFORM, TICKETING2);
+                updateTextsOfButtons(nbPlatform, ticketing1, sbPlatform, ticketing2);
                 break;
 
             case MAGALLANES:
-                updateTextsOfButtons(NB_PLATFORM, NB_TICKETING, SB_PLATFORM, SB_TICKETING);
+                updateTextsOfButtons(nbPlatform, nbTicketing, sbPlatform, sbTicketing);
                 break;
 
             case TAFT:
-                updateTextsOfButtons(NB_PLATFORM1, NB_PLATFORM2, NB_TICKETING1, NB_TICKETING2);
+                updateTextsOfButtons(nbPlatform1, nbPlatform2, nbTicketing1, nbTicketing2);
                 break;
 
             default:

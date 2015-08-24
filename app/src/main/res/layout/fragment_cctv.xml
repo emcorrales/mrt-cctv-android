@@ -6,7 +6,7 @@
     tools:context="com.pinoymobileapps.mrtcctv.CctvFragment">
 
     <ImageView
-        android:id="@+id/preview"
+        android:id="@+id/image_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="fitXY" />

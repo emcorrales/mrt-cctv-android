@@ -25,8 +25,14 @@ import butterknife.ButterKnife;
 
 public class CctvFragment extends Fragment {
 
-    private static String TAG = CctvFragment.class.getSimpleName();
-    private static boolean IS_STREAMING = false;
+    @Bind(R.id.cctv_status)
+    TextView mCctvStatus;
+
+    @Bind(R.id.progressbar)
+    View mProgressBar;
+
+    @Bind(R.id.image_view)
+    ImageView mImageView;
 
     private int mCctvStatusVisibility;
     private int mProgressBarVisibility;
@@ -35,15 +41,6 @@ public class CctvFragment extends Fragment {
     private boolean mIsChangingOrientation = false;
     private Bitmap mImage;
 
-    @Bind(R.id.cctv_status)
-    TextView mCctvStatus;
-
-    @Bind(R.id.progressbar)
-    View mProgressBar;
-
-    @Bind(R.id.preview)
-    ImageView mPreview;
-
     private class StreamingTask extends AsyncTask<Void, Void, ResponseDetails> {
         int cameraId;
 
@@ -51,7 +48,6 @@ public class CctvFragment extends Fragment {
         protected void onPreExecute() {
             super.onPreExecute();
             cameraId = mCameraId;
-            IS_STREAMING = true;
         }
 
         @Override
@@ -67,39 +63,27 @@ public class CctvFragment extends Fragment {
         @Override
         protected void onPostExecute(ResponseDetails responseDetails) {
             super.onPostExecute(responseDetails);
-            IS_STREAMING = false;
-
             //If has internet connection.
             if (responseDetails != null && responseDetails.isConnected()) {
-                //if request was successful and the requested image is the same.
-                if (responseDetails.getResponseCode() == 200) {
-                    //If request hasn't changed while waiting for a response.
-                    if (responseDetails.getStationId() == mStationId
-                            && responseDetails.getCameraId() == mCameraId) {
-                        //If responded with an image.
-                        if (responseDetails.getImage() != null) {
-                            mCctvStatus.setVisibility(View.INVISIBLE);
-                            mProgressBar.setVisibility(View.INVISIBLE);
-                            mImage = responseDetails.getImage();
-                            mPreview.setImageBitmap(mImage);
-
-                        } else { //If didn't respond with an image cctv might not be available.
-                            mImage = null;
-                            mPreview.setImageBitmap(mImage);
-                            displayMessage(R.string.no_cctv);
-                        }
-                    } else { //If the request has changed while waiting, keep loading.
-                        mImage = null;
-                        mPreview.setImageBitmap(mImage);
+                //If request hasn't changed while waiting for a response.
+                if (responseDetails.getStationId() == mStationId
+                        && responseDetails.getCameraId() == mCameraId) {
+                    //if the request was successful and responded with an image.
+                    if (responseDetails.getResponseCode() == 200
+                            && responseDetails.getImage() != null) {
+                        showImage(responseDetails.getImage());
+                    } else {//If request failed.
+                        clearImage();
+                        displayMessage(R.string.no_cctv);
                     }
+                } else { //If the request has changed while waiting, keep loading.
+                    showLoading();
                 }
+
             } else { //If no internet connection.
                 displayMessage(R.string.no_connection);
             }
-
-            if (isResumed()) {
-                new StreamingTask().execute();
-            }
+            new StreamingTask().execute();
         }
     }
 
@@ -121,27 +105,25 @@ public class CctvFragment extends Fragment {
         super.onResume();
         if (mIsChangingOrientation) {
             if (mImage != null) {
-                mPreview.setImageBitmap(mImage);
+                showImage(mImage);
+            } else {
+                mCctvStatus.setVisibility(mCctvStatusVisibility);
+                mProgressBar.setVisibility(mProgressBarVisibility);
             }
-            mCctvStatus.setVisibility(mCctvStatusVisibility);
-            mProgressBar.setVisibility(mProgressBarVisibility);
         } else {
-            clear();
+            showLoading();
         }
-
-        if (!IS_STREAMING) {
-            new StreamingTask().execute();
-        }
+        new StreamingTask().execute();
     }
 
     @Override
     public void onPause() {
-        saveCustomState();
+        saveState();
         mIsChangingOrientation = false;
         super.onPause();
     }
 
-    private void saveCustomState() {
+    private void saveState() {
         if (mCctvStatus != null) {
             mCctvStatusVisibility = mCctvStatus.getVisibility();
         }
@@ -156,18 +138,34 @@ public class CctvFragment extends Fragment {
         super.onDetach();
     }
 
-    public void setCamera(int stationId, int cameraId) {
-        if (mStationId != stationId || mCameraId != cameraId) {
-            mStationId = stationId;
-            mCameraId = cameraId;
-            clear();
+    private void showImage(Bitmap image) {
+        if (image == null) {
+            throw new IllegalArgumentException("image cannot be null");
+        } else {
+            mCctvStatus.setVisibility(View.INVISIBLE);
+            mProgressBar.setVisibility(View.INVISIBLE);
+            mImage = image;
+            mImageView.setImageBitmap(image);
         }
     }
 
-    private void clear() {
+    public void setCamera(int stationId, int cameraId) {
+        if (mStationId != stationId || mCameraId != cameraId) {
+            showLoading();
+            mStationId = stationId;
+            mCameraId = cameraId;
+        }
+    }
+
+    private void showLoading() {
+        clearImage();
         displayProgressBar();
-        if (mPreview != null) {
-            mPreview.setImageBitmap(null);
+    }
+
+    private void clearImage() {
+        mImage = null;
+        if (mImageView != null) {
+            mImageView.setImageBitmap(null);
         }
     }
 
@@ -186,11 +184,11 @@ public class CctvFragment extends Fragment {
             mCctvStatus.setText(message);
             mCctvStatus.setVisibility(View.VISIBLE);
             mProgressBar.setVisibility(View.INVISIBLE);
-            mPreview.setImageBitmap(null);
+            mImageView.setImageBitmap(null);
         }
     }
 
-    static boolean isConnected(Context context) {
+    private boolean isConnected(Context context) {
         if (context != null) {
             ConnectivityManager connMgr = (ConnectivityManager)
                     context.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -201,18 +199,15 @@ public class CctvFragment extends Fragment {
                     return networkInfo.isConnected();
                 }
             }
-
         }
-
         return false;
     }
 
-    public static ResponseDetails stream(Context context, int stationId, int cameraId)
+    private ResponseDetails stream(Context context, int stationId, int cameraId)
             throws IOException {
         ResponseDetails responseDetails = new ResponseDetails(stationId, cameraId);
 
         if (isConnected(context)) {
-
             responseDetails.setIsConnected(true);
             InputStream is = null;
 
