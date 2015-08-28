@@ -8,21 +8,17 @@
     <string name="connection_timeout">Connection timeout.</string>
     <string name="no_cctv">CCTV not available.</string>
 
-    <string name="nb_platfrom">NORTHBOUND PLATFORM</string>
-    <string name="nb_platfrom1">NORTHBOUND PLATFORM1</string>
-    <string name="nb_platfrom2">NORTHBOUND PLATFORM2</string>
+    <string name="nb_platfrom">NORTH BOUND PLATFORM</string>
+    <string name="nb_platfrom1">NORTH BOUND PLATFORM1</string>
+    <string name="nb_platfrom2">NORTH BOUND PLATFORM2</string>
 
-    <string name="sb_platfrom">SOUTHBOUND PLATFORM</string>
-    <string name="sb_platfrom1">SOUTHBOUND PLATFORM1</string>
-    <string name="sb_platfrom2">SOUTHBOUND PLATFORM2</string>
+    <string name="sb_platfrom">SOUTH BOUND PLATFORM</string>
 
-    <string name="sb_ticketing">SOUTHBOUND TICKETING</string>
-    <string name="sb_ticketing1">SOUTHBOUND TICKETING1</string>
-    <string name="sb_ticketing2">SOUTHBOUND TICKETING2</string>
+    <string name="sb_ticketing">SOUTH BOUND TICKETING</string>
 
-    <string name="nb_ticketing">NORTHBOUND TICKETING</string>
-    <string name="nb_ticketing1">NORTHBOUND TICKETING1</string>
-    <string name="nb_ticketing2">NORTHBOUND TICKETING2</string>
+    <string name="nb_ticketing">NORTH BOUND TICKETING</string>
+    <string name="nb_ticketing1">NORTH BOUND TICKETING1</string>
+    <string name="nb_ticketing2">NORTH BOUND TICKETING2</string>
 
     <string name="ticketing1">TICKETING1</string>
     <string name="ticketing2">TICKETING2</string>
