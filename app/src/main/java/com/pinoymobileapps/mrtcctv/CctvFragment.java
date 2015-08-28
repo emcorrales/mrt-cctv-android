@@ -72,6 +72,9 @@ public class CctvFragment extends Fragment {
                     if (responseDetails.getResponseCode() == 200
                             && responseDetails.getImage() != null) {
                         showImage(responseDetails.getImage());
+                    } else if (responseDetails.getResponseCode() == 408) {//If connection timeout.
+                        clearImage();
+                        displayMessage(R.string.connection_timeout);
                     } else {//If request failed.
                         clearImage();
                         displayMessage(R.string.no_cctv);
