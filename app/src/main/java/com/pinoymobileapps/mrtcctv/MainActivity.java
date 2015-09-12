@@ -68,18 +68,10 @@ public class MainActivity extends AppCompatActivity {
     private String nbPlatform;
     private String nbPlatform1;
     private String nbPlatform2;
+    private String nbTicketing;
 
     private String sbPlatform;
-    private String sbPlatform1;
-    private String sbPlatform2;
-
-    private String nbTicketing;
-    private String nbTicketing1;
-    private String nbTicketing2;
-
     private String sbTicketing;
-    private String sbTicketing1;
-    private String sbTicketing2;
 
     private String ticketing1;
     private String ticketing2;
@@ -133,21 +125,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initStrings() {
-        nbPlatform = getResources().getString(R.string.nb_platfrom);
-        nbPlatform1 = getResources().getString(R.string.nb_platfrom1);
-        nbPlatform2 = getResources().getString(R.string.nb_platfrom2);
-
-        sbPlatform = getResources().getString(R.string.sb_platfrom);
-        sbPlatform1 = getResources().getString(R.string.sb_platfrom1);
-        sbPlatform2 = getResources().getString(R.string.sb_platfrom2);
-
+        nbPlatform = getResources().getString(R.string.nb_platform);
+        nbPlatform1 = getResources().getString(R.string.nb_platform1);
+        nbPlatform2 = getResources().getString(R.string.nb_platform2);
         nbTicketing = getResources().getString(R.string.nb_ticketing);
-        nbTicketing1 = getResources().getString(R.string.nb_ticketing1);
-        nbTicketing2 = getResources().getString(R.string.nb_ticketing2);
 
+        sbPlatform = getResources().getString(R.string.sb_platform);
         sbTicketing = getResources().getString(R.string.sb_ticketing);
-        sbTicketing1 = getResources().getString(R.string.sb_ticketing1);
-        sbTicketing2 = getResources().getString(R.string.sb_ticketing2);
 
         ticketing1 = getResources().getString(R.string.ticketing1);
         ticketing2 = getResources().getString(R.string.ticketing2);
@@ -257,7 +241,7 @@ public class MainActivity extends AppCompatActivity {
 
         switch (mCurrentStationId) {
             case NORTH_AVE:
-                updateTextsOfButtons(sbPlatform1, sbPlatform2, sbTicketing1, sbTicketing2);
+                updateTextsOfButtons(nbPlatform, nbTicketing, sbPlatform, sbTicketing);
                 break;
 
             case QUEZON_AVE:
@@ -305,7 +289,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
 
             case TAFT:
-                updateTextsOfButtons(nbPlatform1, nbPlatform2, nbTicketing1, nbTicketing2);
+                updateTextsOfButtons(nbPlatform1, nbPlatform2, ticketing1, ticketing2);
                 break;
 
             default:
