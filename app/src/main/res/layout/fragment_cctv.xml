@@ -16,7 +16,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="@string/no_cctv"
+        android:layout_margin="16dp"
+        android:gravity="center"
+        android:text="@string/cctv_not_available"
         android:textColor="@android:color/white"
         android:visibility="invisible" />
 

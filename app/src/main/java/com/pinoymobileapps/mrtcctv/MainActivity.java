@@ -1,8 +1,11 @@
 package com.pinoymobileapps.mrtcctv;
 
+import android.content.Context;
 import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -149,7 +152,9 @@ public class MainActivity extends AppCompatActivity {
         super.onWindowFocusChanged(hasFocus);
         if (hasFocus
                 && getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE
-                && mCctvFragment != null) {
+                && mCctvFragment != null
+                && mCctvFragment.getView() != null
+                && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             mCctvFragment.getView().setSystemUiVisibility(
                     View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                             | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
@@ -300,7 +305,7 @@ public class MainActivity extends AppCompatActivity {
     private void selectButton(Button button) {
         clearButtons();
         if (button != null) {
-            button.setTextColor(getResources().getColor(R.color.button_selected_text));
+            button.setTextColor(ContextCompat.getColor(this, R.color.button_selected_text));
         }
     }
 
@@ -313,7 +318,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void clearButton(Button button) {
         if (button != null) {
-            button.setTextColor(getResources().getColor(R.color.button_default_text));
+            button.setTextColor(ContextCompat.getColor(this, R.color.button_default_text));
         }
     }
 

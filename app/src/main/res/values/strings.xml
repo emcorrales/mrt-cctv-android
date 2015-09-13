@@ -3,10 +3,20 @@
 
     <string name="app_name">MRT3 CCTV</string>
     <string name="title_activity_main">MRT3 CCTV</string>
+    <string name="api_base_url">http://api.pinoymobileapps.com</string>
 
-    <string name="no_connection">Network connection not available.</string>
-    <string name="connection_timeout">Connection timeout.</string>
-    <string name="no_cctv">CCTV not available.</string>
+    <string name="connection_not_available">
+        Network not available.
+        Please check if your wifi or mobile data is turned on.
+    </string>
+    <string name="connection_timeout">
+        Connection timeout. This may be caused by poor internet
+        connection or the system may be under maintenance.
+    </string>
+    <string name="cctv_not_available">
+        CCTV not available at the moment.
+        Please check other CCTV.
+    </string>
 
     <string name="nb_platform">NORTH BOUND PLATFORM</string>
     <string name="nb_platform1">NORTH BOUND PLATFORM1</string>

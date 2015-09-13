@@ -14,14 +14,17 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.io.BufferedInputStream;
+import com.squareup.okhttp.ResponseBody;
+
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.SocketTimeoutException;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import retrofit.Call;
+import retrofit.Callback;
+import retrofit.Response;
+import retrofit.Retrofit;
 
 public class CctvFragment extends Fragment {
 
@@ -41,59 +44,17 @@ public class CctvFragment extends Fragment {
     private boolean mIsChangingOrientation = false;
     private Bitmap mImage;
 
-    private class StreamingTask extends AsyncTask<Void, Void, ResponseDetails> {
-        int cameraId;
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            cameraId = mCameraId;
-        }
-
-        @Override
-        protected ResponseDetails doInBackground(Void... params) {
-            try {
-                return stream(getActivity(), mStationId, mCameraId);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(ResponseDetails responseDetails) {
-            super.onPostExecute(responseDetails);
-            //If has internet connection.
-            if (responseDetails != null && responseDetails.isConnected()) {
-                //If request hasn't changed while waiting for a response.
-                if (responseDetails.getStationId() == mStationId
-                        && responseDetails.getCameraId() == mCameraId) {
-                    //if the request was successful and responded with an image.
-                    if (responseDetails.getResponseCode() == 200
-                            && responseDetails.getImage() != null) {
-                        showImage(responseDetails.getImage());
-                    } else if (responseDetails.getResponseCode() == 408) {//If connection timeout.
-                        clearImage();
-                        displayMessage(R.string.connection_timeout);
-                    } else {//If request failed.
-                        clearImage();
-                        displayMessage(R.string.no_cctv);
-                    }
-                } else { //If the request has changed while waiting, keep loading.
-                    showLoading();
-                }
-
-            } else { //If no internet connection.
-                displayMessage(R.string.no_connection);
-            }
-            new StreamingTask().execute();
-        }
-    }
+    private ApiService mApiService;
+    private Call<ResponseBody> mCaller;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
+
+        String baseUrl = getResources().getString(R.string.api_base_url);
+        Retrofit retrofit = new Retrofit.Builder().baseUrl(baseUrl).build();
+        mApiService = retrofit.create(ApiService.class);
     }
 
     @Override
@@ -116,7 +77,102 @@ public class CctvFragment extends Fragment {
         } else {
             showLoading();
         }
-        new StreamingTask().execute();
+        stream(mStationId, mCameraId);
+    }
+
+    private void stream(final int stationId, final int cameraId) {
+        if (isResumed()) {
+            //If has internet connection.
+            if (isConnected(getActivity())) {
+                mCaller = mApiService.stream(stationId, cameraId);
+                mCaller.enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Response<ResponseBody> response) {
+                        //If request hasn't changed while waiting for a response.
+                        if (stationId == mStationId && cameraId == mCameraId) {
+                            //if the request was successful and responded with an image.
+                            if (response.code() == 200 && response.body() != null) {
+                                try {
+                                    mImage = BitmapFactory.decodeStream(response.body().byteStream());
+                                    if (mImage != null) {
+                                        showImage(mImage);
+                                    } else {//If didn't return an image.
+                                        clearImage();
+                                        displayMessage(R.string.cctv_not_available);
+                                    }
+
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+
+                            } else if (response.code() == 408) {//If connection timeout.
+                                clearImage();
+                                displayMessage(R.string.connection_timeout);
+                            } else {//If request failed.
+                                clearImage();
+                                displayMessage(R.string.cctv_not_available);
+                            }
+
+                        } else {//If the request has changed while waiting, keep loading.
+                            showLoading();
+                        }
+
+                        stream(mStationId, mCameraId);
+                    }
+
+                    @Override
+                    public void onFailure(Throwable t) {
+                        if (t instanceof SocketTimeoutException) {
+                            clearImage();
+                            displayMessage(R.string.connection_timeout);
+                        } else {
+                            clearImage();
+                            displayMessage(R.string.cctv_not_available);
+                        }
+                        stream(mStationId, mCameraId);
+                    }
+                });
+
+            } else {//If no internet connection.
+                displayMessage(R.string.connection_not_available);
+                waitForAvailableNetwork();
+            }
+        }
+    }
+
+    private boolean isConnected(Context context) {
+        if (context != null) {
+            ConnectivityManager connMgr = (ConnectivityManager)
+                    context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+            if (connMgr != null) {
+                NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+                if (networkInfo != null) {
+                    return networkInfo.isConnected();
+                }
+            }
+        }
+        return false;
+    }
+
+    private void waitForAvailableNetwork() {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                while (!isConnected(getActivity())) {
+                    if (mCaller != null) {
+                        mCaller.cancel();
+                    }
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                stream(mStationId, mCameraId);
+            }
+        }.execute();
     }
 
     @Override
@@ -143,7 +199,7 @@ public class CctvFragment extends Fragment {
 
     private void showImage(Bitmap image) {
         if (image == null) {
-            throw new IllegalArgumentException("image cannot be null");
+            throw new IllegalArgumentException("image cannot be null.");
         } else {
             mCctvStatus.setVisibility(View.INVISIBLE);
             mProgressBar.setVisibility(View.INVISIBLE);
@@ -154,9 +210,13 @@ public class CctvFragment extends Fragment {
 
     public void setCamera(int stationId, int cameraId) {
         if (mStationId != stationId || mCameraId != cameraId) {
-            showLoading();
+            if (mCaller != null) {
+                mCaller.cancel();
+            }
             mStationId = stationId;
             mCameraId = cameraId;
+            showLoading();
+            stream(mStationId, mCameraId);
         }
     }
 
@@ -190,56 +250,4 @@ public class CctvFragment extends Fragment {
             mImageView.setImageBitmap(null);
         }
     }
-
-    private boolean isConnected(Context context) {
-        if (context != null) {
-            ConnectivityManager connMgr = (ConnectivityManager)
-                    context.getSystemService(Context.CONNECTIVITY_SERVICE);
-
-            if (connMgr != null) {
-                NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-                if (networkInfo != null) {
-                    return networkInfo.isConnected();
-                }
-            }
-        }
-        return false;
-    }
-
-    private ResponseDetails stream(Context context, int stationId, int cameraId)
-            throws IOException {
-        ResponseDetails responseDetails = new ResponseDetails(stationId, cameraId);
-
-        if (isConnected(context)) {
-            responseDetails.setIsConnected(true);
-            InputStream is = null;
-
-            try {
-                URL url = new URL("http://api.pinoymobileapps.com/mrtcctv/?stationId="
-                        + stationId + "&cameraId=" + cameraId);
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.connect();
-
-                responseDetails.setResponseCode(conn.getResponseCode());
-                if (responseDetails.getResponseCode() == 200) {
-                    is = conn.getInputStream();
-                    BufferedInputStream bufferedInputStream = new BufferedInputStream(is);
-                    Bitmap image = BitmapFactory.decodeStream(bufferedInputStream);
-                    responseDetails.setImage(image);
-                }
-
-            } finally {
-                if (is != null) {
-                    is.close();
-                }
-            }
-
-        } else {
-            responseDetails.setIsConnected(false);
-        }
-
-        return responseDetails;
-    }
-
-
 }
