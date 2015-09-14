@@ -88,33 +88,29 @@ public class CctvFragment extends Fragment {
                 mCaller.enqueue(new Callback<ResponseBody>() {
                     @Override
                     public void onResponse(Response<ResponseBody> response) {
-                        //If request hasn't changed while waiting for a response.
-                        if (stationId == mStationId && cameraId == mCameraId) {
-                            //if the request was successful and responded with an image.
-                            if (response.code() == 200 && response.body() != null) {
-                                try {
-                                    mImage = BitmapFactory.decodeStream(response.body().byteStream());
+                        if (response.code() == 200 && response.body() != null) {
+                            try {
+                                mImage = BitmapFactory.decodeStream(response.body().byteStream());
+                                //If requested cctv hasn't changed while waiting for a response.
+                                if (stationId == mStationId && cameraId == mCameraId) {
                                     if (mImage != null) {
                                         showImage(mImage);
-                                    } else {//If didn't return an image.
+                                    } else {//if response doesn't contain an image.
                                         clearImage();
                                         displayMessage(R.string.cctv_not_available);
                                     }
-
-                                } catch (IOException e) {
-                                    e.printStackTrace();
                                 }
 
-                            } else if (response.code() == 408) {//If connection timeout.
-                                clearImage();
-                                displayMessage(R.string.connection_timeout);
-                            } else {//If request failed.
-                                clearImage();
-                                displayMessage(R.string.cctv_not_available);
+                            } catch (IOException e) {
+                                e.printStackTrace();
                             }
 
-                        } else {//If the request has changed while waiting, keep loading.
-                            showLoading();
+                        } else if (response.code() == 408) {//If connection timeout.
+                            clearImage();
+                            displayMessage(R.string.connection_timeout);
+                        } else {//If request failed.
+                            clearImage();
+                            displayMessage(R.string.cctv_not_available);
                         }
 
                         stream(mStationId, mCameraId);
@@ -125,9 +121,6 @@ public class CctvFragment extends Fragment {
                         if (t instanceof SocketTimeoutException) {
                             clearImage();
                             displayMessage(R.string.connection_timeout);
-                        } else {
-                            clearImage();
-                            displayMessage(R.string.cctv_not_available);
                         }
                         stream(mStationId, mCameraId);
                     }
@@ -216,7 +209,6 @@ public class CctvFragment extends Fragment {
             mStationId = stationId;
             mCameraId = cameraId;
             showLoading();
-            stream(mStationId, mCameraId);
         }
     }
 

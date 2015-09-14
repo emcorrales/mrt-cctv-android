@@ -294,7 +294,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
 
             case TAFT:
-                updateTextsOfButtons(nbPlatform1, nbPlatform2, ticketing1, ticketing2);
+                updateTextsOfButtons(nbPlatform1, ticketing1, nbPlatform2, ticketing2);
                 break;
 
             default:

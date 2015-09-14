@@ -6,7 +6,7 @@
     <string name="api_base_url">http://api.pinoymobileapps.com</string>
 
     <string name="connection_not_available">
-        Network not available.
+        Network connection not available.
         Please check if your wifi or mobile data is turned on.
     </string>
     <string name="connection_timeout">
@@ -15,7 +15,7 @@
     </string>
     <string name="cctv_not_available">
         CCTV not available at the moment.
-        Please check other CCTV.
+        Please check other CCTV cameras.
     </string>
 
     <string name="nb_platform">NORTH BOUND PLATFORM</string>
