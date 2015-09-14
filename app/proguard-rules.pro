@@ -16,6 +16,9 @@
 #   public *;
 #}
 
+
+# BUTTERKNIFE
+
 -keep class butterknife.** { *; }
 -dontwarn butterknife.internal.**
 -keep class **$$ViewBinder { *; }
@@ -27,3 +30,11 @@
 -keepclasseswithmembernames class * {
     @butterknife.* <methods>;
 }
+
+# RETROFIT
+-dontwarn retrofit.**
+-keep class retrofit.** { *; }
+-keepattributes Signature
+-keepattributes Exceptions
+
+-dontwarn okio.**
