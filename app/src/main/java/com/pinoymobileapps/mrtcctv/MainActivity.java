@@ -1,6 +1,5 @@
 package com.pinoymobileapps.mrtcctv;
 
-import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;

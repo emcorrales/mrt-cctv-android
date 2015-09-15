@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">MRT3 CCTV</string>
+    <string name="app_name">MRT CCTV</string>
     <string name="title_activity_main">MRT3 CCTV</string>
     <string name="api_base_url">http://api.pinoymobileapps.com</string>
 
