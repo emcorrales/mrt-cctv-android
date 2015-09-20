@@ -15,7 +15,7 @@
         Attempting to reconnect. Please wait...
     </string>
     <string name="cctv_not_available">
-        CCTV camera may be temporarily unavailable.
+        CCTV camera may be temporarily not available.
         Attempting to establish connection.
         Please wait or check other CCTV cameras.
     </string>

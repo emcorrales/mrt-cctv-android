@@ -52,7 +52,6 @@ public class CctvFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-
         String baseUrl = getResources().getString(R.string.api_base_url);
         Retrofit retrofit = new Retrofit.Builder().baseUrl(baseUrl).build();
         mApiService = retrofit.create(ApiService.class);
@@ -69,23 +68,35 @@ public class CctvFragment extends Fragment {
     public void onResume() {
         super.onResume();
         if (mIsChangingOrientation) {
-            if (mImage != null) {
-                showImage(mImage);
-            } else {
-                mCctvStatus.setVisibility(mCctvStatusVisibility);
-                mProgressBar.setVisibility(mProgressBarVisibility);
+            restoreViewStates();
+            if (mCaller == null) {
+                stream(mStationId, mCameraId);
             }
         } else {
             cancelRequest();
+            clearImage();
             hideMessage();
             showProgressBar();
             stream(mStationId, mCameraId);
         }
     }
 
+    public void restoreViewStates() {
+        if (mImage != null) {
+            showImage(mImage);
+        }
+        if (mCctvStatus != null) {
+            mCctvStatus.setVisibility(mCctvStatusVisibility);
+        }
+        if (mProgressBar != null) {
+            mProgressBar.setVisibility(mProgressBarVisibility);
+        }
+    }
+
     private void cancelRequest() {
         if (mCaller != null) {
             mCaller.cancel();
+            mCaller = null;
         }
     }
 
@@ -99,8 +110,8 @@ public class CctvFragment extends Fragment {
             mCaller.enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(Response<ResponseBody> response) {
+                    //If requested cctv hasn't changed while waiting for a response.
                     if (stationId == mStationId && cameraId == mCameraId) {
-                        //If requested cctv hasn't changed while waiting for a response.
                         if (response.code() == 200 && response.body() != null) {
                             try {
                                 mImage = BitmapFactory.decodeStream(response.body().byteStream());
@@ -128,6 +139,8 @@ public class CctvFragment extends Fragment {
                     }
                 }
             });
+        } else {
+            cancelRequest();
         }
     }
 
@@ -166,12 +179,12 @@ public class CctvFragment extends Fragment {
 
     @Override
     public void onPause() {
-        saveState();
+        saveViewStates();
         mIsChangingOrientation = false;
         super.onPause();
     }
 
-    private void saveState() {
+    private void saveViewStates() {
         if (mCctvStatus != null) {
             mCctvStatusVisibility = mCctvStatus.getVisibility();
         }
