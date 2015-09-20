@@ -18,6 +18,7 @@ import com.squareup.okhttp.ResponseBody;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -27,9 +28,6 @@ import retrofit.Response;
 import retrofit.Retrofit;
 
 public class CctvFragment extends Fragment {
-
-    private static final int HTTP_SUCCESS = 200;
-    private static final int HTTP_CONNECTION_TIMEOUT = 408;
 
     @Bind(R.id.cctv_status)
     TextView mCctvStatus;
@@ -48,6 +46,7 @@ public class CctvFragment extends Fragment {
     private Bitmap mImage;
     private ApiService mApiService;
     private Call<ResponseBody> mCaller;
+    private boolean mIsUsingNewApi = true;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -77,60 +76,58 @@ public class CctvFragment extends Fragment {
                 mProgressBar.setVisibility(mProgressBarVisibility);
             }
         } else {
-            showLoading();
+            cancelRequest();
+            hideMessage();
+            showProgressBar();
+            stream(mStationId, mCameraId);
         }
-        stream(mStationId, mCameraId);
+    }
+
+    private void cancelRequest() {
+        if (mCaller != null) {
+            mCaller.cancel();
+        }
     }
 
     private void stream(final int stationId, final int cameraId) {
         if (isResumed()) {
-            if (isConnected(getActivity())) {
-                mCaller = mApiService.stream(stationId, cameraId);
-                mCaller.enqueue(new Callback<ResponseBody>() {
-                    @Override
-                    public void onResponse(Response<ResponseBody> response) {
-                        if (response.code() == HTTP_SUCCESS && response.body() != null) {
+            if (mIsUsingNewApi) {
+                mCaller = mApiService.streamV2(stationId, cameraId);
+            } else {
+                mCaller = mApiService.streamV1(stationId, cameraId);
+            }
+            mCaller.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Response<ResponseBody> response) {
+                    if (stationId == mStationId && cameraId == mCameraId) {
+                        //If requested cctv hasn't changed while waiting for a response.
+                        if (response.code() == 200 && response.body() != null) {
                             try {
                                 mImage = BitmapFactory.decodeStream(response.body().byteStream());
-                                //If requested cctv hasn't changed while waiting for a response.
-                                if (stationId == mStationId && cameraId == mCameraId) {
-                                    if (mImage != null) {
-                                        showImage(mImage);
-                                    } else {//if response doesn't contain an image.
-                                        clearImage();
-                                        displayMessage(R.string.cctv_not_available);
-                                    }
+                                if (mImage != null) {
+                                    showImage(mImage);
+                                } else {//if response doesn't contain an image.
+                                    handleCctvNotAvailable();
                                 }
-
                             } catch (IOException e) {
-                                e.printStackTrace();
+                                handleCctvNotAvailable();
                             }
-
-                        } else if (response.code() == HTTP_CONNECTION_TIMEOUT) {//If connection timeout.
-                            clearImage();
-                            displayMessage(R.string.connection_timeout);
                         } else {//If request failed.
-                            clearImage();
-                            displayMessage(R.string.cctv_not_available);
+                            handleCctvNotAvailable();
                         }
-
-                        stream(mStationId, mCameraId);
                     }
+                    stream(mStationId, mCameraId);
+                }
 
-                    @Override
-                    public void onFailure(Throwable t) {
-                        if (t instanceof SocketTimeoutException) {
-                            clearImage();
-                            displayMessage(R.string.connection_timeout);
-                        }
-                        stream(mStationId, mCameraId);
+                @Override
+                public void onFailure(Throwable t) {
+                    if (t instanceof SocketTimeoutException) {
+                        handleRequestTimeout();
+                    } else if (t instanceof UnknownHostException) {
+                        handleNetworkNotAvailable();
                     }
-                });
-
-            } else {//If no internet connection.
-                displayMessage(R.string.connection_not_available);
-                waitForAvailableNetwork();
-            }
+                }
+            });
         }
     }
 
@@ -154,9 +151,7 @@ public class CctvFragment extends Fragment {
             @Override
             protected Void doInBackground(Void... params) {
                 while (!isConnected(getActivity()) && isResumed()) {
-                    if (mCaller != null) {
-                        mCaller.cancel();
-                    }
+                    cancelRequest();
                 }
                 return null;
             }
@@ -195,27 +190,57 @@ public class CctvFragment extends Fragment {
         if (image == null) {
             throw new IllegalArgumentException("image cannot be null.");
         } else {
-            mCctvStatus.setVisibility(View.INVISIBLE);
-            mProgressBar.setVisibility(View.INVISIBLE);
+            hideMessage();
+            hideProgressBar();
             mImage = image;
             mImageView.setImageBitmap(image);
         }
     }
 
-    public void setCamera(int stationId, int cameraId) {
-        if (mStationId != stationId || mCameraId != cameraId) {
-            if (mCaller != null) {
-                mCaller.cancel();
-            }
-            mStationId = stationId;
-            mCameraId = cameraId;
-            showLoading();
+    private void handleRequestTimeout() {
+        mIsUsingNewApi = !mIsUsingNewApi;
+        clearImage();
+        showMessage(R.string.connection_timeout);
+        stream(mStationId, mCameraId);
+    }
+
+    private void handleCctvNotAvailable() {
+        mIsUsingNewApi = !mIsUsingNewApi;
+        clearImage();
+        showMessage(R.string.cctv_not_available);
+    }
+
+    private void handleNetworkNotAvailable() {
+        clearImage();
+        hideProgressBar();
+        showMessage(R.string.connection_not_available);
+        waitForAvailableNetwork();
+    }
+
+    private void showProgressBar() {
+        if (mProgressBar != null) {
+            mProgressBar.setVisibility(View.VISIBLE);
         }
     }
 
-    private void showLoading() {
-        clearImage();
-        displayProgressBar();
+    private void hideProgressBar() {
+        if (mProgressBar != null) {
+            mProgressBar.setVisibility(View.GONE);
+        }
+    }
+
+    private void showMessage(int stringResId) {
+        if (getActivity() != null) {
+            String message = getResources().getString(stringResId);
+            mCctvStatus.setText(message);
+            mCctvStatus.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void hideMessage() {
+        if (mCctvStatus != null) {
+            mCctvStatus.setVisibility(View.GONE);
+        }
     }
 
     private void clearImage() {
@@ -225,22 +250,16 @@ public class CctvFragment extends Fragment {
         }
     }
 
-    private void displayProgressBar() {
-        if (mCctvStatus != null) {
-            mCctvStatus.setVisibility(View.INVISIBLE);
-        }
-        if (mProgressBar != null) {
-            mProgressBar.setVisibility(View.VISIBLE);
-        }
-    }
-
-    private void displayMessage(int stringResId) {
-        if (getActivity() != null) {
-            String message = getResources().getString(stringResId);
-            mCctvStatus.setText(message);
-            mCctvStatus.setVisibility(View.VISIBLE);
-            mProgressBar.setVisibility(View.INVISIBLE);
-            mImageView.setImageBitmap(null);
+    public void setCamera(int stationId, int cameraId) {
+        if (mStationId != stationId || mCameraId != cameraId) {
+            cancelRequest();
+            mStationId = stationId;
+            mCameraId = cameraId;
+            mIsUsingNewApi = false;
+            clearImage();
+            hideMessage();
+            showProgressBar();
+            stream(stationId, cameraId);
         }
     }
 }

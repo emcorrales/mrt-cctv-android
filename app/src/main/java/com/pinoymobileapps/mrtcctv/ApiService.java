@@ -8,6 +8,9 @@ import retrofit.http.Query;
 
 public interface ApiService {
     @GET("/mrtcctv2/")
-    Call<ResponseBody> stream(@Query("stationId") int stationId, @Query("cameraId") int cameraId);
+    Call<ResponseBody> streamV2(@Query("stationId") int stationId, @Query("cameraId") int cameraId);
+
+    @GET("/mrtcctv/")
+    Call<ResponseBody> streamV1(@Query("stationId") int stationId, @Query("cameraId") int cameraId);
 }
 

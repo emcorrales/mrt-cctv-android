@@ -7,15 +7,17 @@
 
     <string name="connection_not_available">
         Network connection not available.
-        Please check if your wifi or mobile data is turned on.
+        Please check if your wifi or mobile data is enabled.
     </string>
     <string name="connection_timeout">
         Connection timeout. This may be caused by poor internet
         connection or the system may be under maintenance.
+        Attempting to reconnect. Please wait...
     </string>
     <string name="cctv_not_available">
-        CCTV not available at the moment.
-        Please check other CCTV cameras.
+        CCTV camera may be temporarily unavailable.
+        Attempting to establish connection.
+        Please wait or check other CCTV cameras.
     </string>
 
     <string name="nb_platform">NORTH BOUND PLATFORM</string>
