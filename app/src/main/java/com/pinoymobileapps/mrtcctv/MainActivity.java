@@ -39,19 +39,19 @@ public class MainActivity extends AppCompatActivity {
 
     @Nullable
     @Bind(R.id.button1)
-    Button mButton1;
+    Button mNbPlatform;
 
     @Nullable
     @Bind(R.id.button2)
-    Button mButton2;
+    Button mNbTicketing;
 
     @Nullable
     @Bind(R.id.button3)
-    Button mButton3;
+    Button mSbPlatform;
 
     @Nullable
     @Bind(R.id.button4)
-    Button mButton4;
+    Button mSbTicketing;
 
     private CctvFragment mCctvFragment;
     private String[] mStations;
@@ -175,16 +175,16 @@ public class MainActivity extends AppCompatActivity {
     private Button mapButton(int cameraId) {
         switch (cameraId) {
             case 1:
-                return mButton1;
+                return mNbPlatform;
 
             case 2:
-                return mButton2;
+                return mNbTicketing;
 
             case 3:
-                return mButton3;
+                return mSbPlatform;
 
             case 4:
-                return mButton4;
+                return mSbTicketing;
 
             default:
                 break;
@@ -208,10 +208,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void clearButtons() {
-        clearButton(mButton1);
-        clearButton(mButton2);
-        clearButton(mButton3);
-        clearButton(mButton4);
+        clearButton(mNbPlatform);
+        clearButton(mNbTicketing);
+        clearButton(mSbPlatform);
+        clearButton(mSbTicketing);
     }
 
     private void clearButton(Button button) {
