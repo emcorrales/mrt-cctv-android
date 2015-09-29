@@ -2,7 +2,6 @@
 <resources>
 
     <string name="app_name">MRT CCTV</string>
-    <string name="title_activity_main">MRT3 CCTV</string>
     <string name="api_base_url">http://api.pinoymobileapps.com</string>
 
     <string name="connection_not_available">
@@ -10,9 +9,8 @@
         Please check if your wifi or mobile data is enabled.
     </string>
     <string name="connection_timeout">
-        Connection timeout. This may be caused by poor internet
-        connection or the system may be under maintenance.
-        Attempting to reconnect. Please wait...
+        Connection timeout. Attempting to reconnect. Please wait...
+        This may be caused by poor internet connection or the system may be under maintenance.
     </string>
     <string name="cctv_not_available">
         CCTV camera may be temporarily not available.
@@ -21,13 +19,9 @@
     </string>
 
     <string name="nb_platform">NORTH BOUND PLATFORM</string>
-    <string name="nb_platform1">NORTH BOUND PLATFORM1</string>
-    <string name="nb_platform2">NORTH BOUND PLATFORM2</string>
     <string name="nb_ticketing">NORTH BOUND TICKETING</string>
 
     <string name="sb_platform">SOUTH BOUND PLATFORM</string>
     <string name="sb_ticketing">SOUTH BOUND TICKETING</string>
 
-    <string name="ticketing1">TICKETING1</string>
-    <string name="ticketing2">TICKETING2</string>
 </resources>

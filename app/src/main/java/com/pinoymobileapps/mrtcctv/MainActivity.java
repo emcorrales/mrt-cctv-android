@@ -67,17 +67,6 @@ public class MainActivity extends AppCompatActivity {
     @Bind(R.id.button4)
     Button mButton4;
 
-    private String nbPlatform;
-    private String nbPlatform1;
-    private String nbPlatform2;
-    private String nbTicketing;
-
-    private String sbPlatform;
-    private String sbTicketing;
-
-    private String ticketing1;
-    private String ticketing2;
-
     private CctvFragment mCctvFragment;
     private String[] mStations;
     private int mCurrentStationId = 0;
@@ -90,7 +79,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        initStrings();
         int stationId = NORTH_AVE;
         int cameraId = 1;
 
@@ -98,15 +86,12 @@ public class MainActivity extends AppCompatActivity {
             stationId = savedInstanceState.getInt(KEY_STATION);
             cameraId = savedInstanceState.getInt(KEY_CAMERA);
         }
-
         if (mToolbar != null) {
             setSupportActionBar(mToolbar);
         }
-
         if (mDrawerLayout != null && mDrawerList != null) {
             setupNavigationDrawer(stationId);
         }
-
         mCctvFragment = (CctvFragment) getSupportFragmentManager().findFragmentById(R.id.cctv);
         if (mCctvFragment != null) {
             changeCamera(stationId, cameraId);
@@ -124,19 +109,6 @@ public class MainActivity extends AppCompatActivity {
         if (mDrawerLayout != null) {
             mDrawerLayout.setDrawerListener(mDrawerToggle);
         }
-    }
-
-    private void initStrings() {
-        nbPlatform = getResources().getString(R.string.nb_platform);
-        nbPlatform1 = getResources().getString(R.string.nb_platform1);
-        nbPlatform2 = getResources().getString(R.string.nb_platform2);
-        nbTicketing = getResources().getString(R.string.nb_ticketing);
-
-        sbPlatform = getResources().getString(R.string.sb_platform);
-        sbTicketing = getResources().getString(R.string.sb_ticketing);
-
-        ticketing1 = getResources().getString(R.string.ticketing1);
-        ticketing2 = getResources().getString(R.string.ticketing2);
     }
 
     @Override
@@ -238,66 +210,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void changeStation(final int stationId) {
         mCurrentStationId = stationId;
-
         if (mToolbar != null) {
             setTitle(mStations[stationId]);
-        }
-
-        switch (mCurrentStationId) {
-            case NORTH_AVE:
-                updateTextsOfButtons(nbPlatform, nbTicketing, sbPlatform, sbTicketing);
-                break;
-
-            case QUEZON_AVE:
-                updateTextsOfButtons(nbPlatform, nbTicketing, sbPlatform, sbTicketing);
-                break;
-
-            case KAMUNING:
-                updateTextsOfButtons(nbPlatform, nbTicketing, sbPlatform, sbTicketing);
-                break;
-
-            case CUBAO:
-                updateTextsOfButtons(nbPlatform, nbTicketing, sbPlatform, sbTicketing);
-                break;
-
-            case SANTOLAN:
-                updateTextsOfButtons(nbPlatform, nbTicketing, sbPlatform, sbTicketing);
-                break;
-
-            case ORTIGAS:
-                updateTextsOfButtons(nbPlatform, nbTicketing, sbPlatform, sbTicketing);
-                break;
-
-            case SHAW_BLVD:
-                updateTextsOfButtons(nbPlatform, nbTicketing, sbPlatform, sbTicketing);
-                break;
-
-            case BONI:
-                updateTextsOfButtons(nbPlatform, nbTicketing, sbPlatform, sbTicketing);
-                break;
-
-            case GUADALUPE:
-                updateTextsOfButtons(nbPlatform, nbTicketing, sbPlatform, sbTicketing);
-                break;
-
-            case BUENDIA:
-                updateTextsOfButtons(nbPlatform, ticketing1, sbPlatform, ticketing2);
-                break;
-
-            case AYALA:
-                updateTextsOfButtons(nbPlatform, ticketing1, sbPlatform, ticketing2);
-                break;
-
-            case MAGALLANES:
-                updateTextsOfButtons(nbPlatform, nbTicketing, sbPlatform, sbTicketing);
-                break;
-
-            case TAFT:
-                updateTextsOfButtons(nbPlatform1, ticketing1, nbPlatform2, ticketing2);
-                break;
-
-            default:
-                break;
         }
     }
 
@@ -318,19 +232,6 @@ public class MainActivity extends AppCompatActivity {
     private void clearButton(Button button) {
         if (button != null) {
             button.setTextColor(ContextCompat.getColor(this, R.color.button_default_text));
-        }
-    }
-
-    private void updateTextsOfButtons(String text1, String text2, String text3, String text4) {
-        updateButtonText(mButton1, text1);
-        updateButtonText(mButton2, text2);
-        updateButtonText(mButton3, text3);
-        updateButtonText(mButton4, text4);
-    }
-
-    private void updateButtonText(Button button, String text) {
-        if (button != null) {
-            button.setText(text);
         }
     }
 }

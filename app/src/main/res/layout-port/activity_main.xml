@@ -48,13 +48,15 @@
                 android:id="@+id/button1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:text="@string/nb_platform" />
 
             <Button
                 android:id="@+id/button2"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:text="@string/nb_ticketing" />
         </LinearLayout>
 
         <LinearLayout
@@ -69,13 +71,15 @@
                 android:id="@+id/button3"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:text="@string/sb_platform" />
 
             <Button
                 android:id="@+id/button4"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:text="@string/sb_ticketing" />
         </LinearLayout>
 
     </LinearLayout>
