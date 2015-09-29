@@ -25,20 +25,6 @@ public class MainActivity extends AppCompatActivity {
     private static final String KEY_STATION = "key_station";
     private static final String KEY_CAMERA = "key_camera";
 
-    private static final int NORTH_AVE = 0;
-    private static final int QUEZON_AVE = 1;
-    private static final int KAMUNING = 2;
-    private static final int CUBAO = 3;
-    private static final int SANTOLAN = 4;
-    private static final int ORTIGAS = 5;
-    private static final int SHAW_BLVD = 6;
-    private static final int BONI = 7;
-    private static final int GUADALUPE = 8;
-    private static final int BUENDIA = 9;
-    private static final int AYALA = 10;
-    private static final int MAGALLANES = 11;
-    private static final int TAFT = 12;
-
     @Nullable
     @Bind(R.id.drawer_layout)
     DrawerLayout mDrawerLayout;
@@ -79,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        int stationId = NORTH_AVE;
+        int stationId = 0;
         int cameraId = 1;
 
         if (savedInstanceState != null) {
@@ -156,7 +142,6 @@ public class MainActivity extends AppCompatActivity {
     @Nullable
     @OnClick({R.id.button1, R.id.button2, R.id.button3, R.id.button4})
     void onClickButton(Button button) {
-
         switch (button.getId()) {
             case R.id.button1:
                 changeCamera(mCurrentStationId, 1);

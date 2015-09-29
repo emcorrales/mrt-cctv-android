@@ -14,14 +14,15 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.squareup.okhttp.ResponseBody;
-
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+
+import com.squareup.okhttp.ResponseBody;
+
 import retrofit.Call;
 import retrofit.Callback;
 import retrofit.Response;
@@ -46,7 +47,7 @@ public class CctvFragment extends Fragment {
     private Bitmap mImage;
     private ApiService mApiService;
     private Call<ResponseBody> mCaller;
-    private boolean mIsUsingNewApi = true;
+    private boolean mIsUsingStableApi = true;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -102,10 +103,10 @@ public class CctvFragment extends Fragment {
 
     private void stream(final int stationId, final int cameraId) {
         if (isResumed()) {
-            if (mIsUsingNewApi) {
-                mCaller = mApiService.streamV2(stationId, cameraId);
-            } else {
+            if (mIsUsingStableApi) {
                 mCaller = mApiService.streamV1(stationId, cameraId);
+            } else {
+                mCaller = mApiService.streamV2(stationId, cameraId);
             }
             mCaller.enqueue(new Callback<ResponseBody>() {
                 @Override
@@ -211,14 +212,14 @@ public class CctvFragment extends Fragment {
     }
 
     private void handleRequestTimeout() {
-        mIsUsingNewApi = !mIsUsingNewApi;
+        mIsUsingStableApi = !mIsUsingStableApi;
         clearImage();
         showMessage(R.string.connection_timeout);
         stream(mStationId, mCameraId);
     }
 
     private void handleCctvNotAvailable() {
-        mIsUsingNewApi = !mIsUsingNewApi;
+        mIsUsingStableApi = !mIsUsingStableApi;
         clearImage();
         showMessage(R.string.cctv_not_available);
     }
@@ -268,7 +269,7 @@ public class CctvFragment extends Fragment {
             cancelRequest();
             mStationId = stationId;
             mCameraId = cameraId;
-            mIsUsingNewApi = false;
+            mIsUsingStableApi = true;
             clearImage();
             hideMessage();
             showProgressBar();
