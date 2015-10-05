@@ -38,19 +38,19 @@ public class MainActivity extends AppCompatActivity {
     Toolbar mToolbar;
 
     @Nullable
-    @Bind(R.id.button1)
+    @Bind(R.id.nb_platform)
     Button mNbPlatform;
 
     @Nullable
-    @Bind(R.id.button2)
+    @Bind(R.id.nb_ticketing)
     Button mNbTicketing;
 
     @Nullable
-    @Bind(R.id.button3)
+    @Bind(R.id.sb_platform)
     Button mSbPlatform;
 
     @Nullable
-    @Bind(R.id.button4)
+    @Bind(R.id.sb_ticketing)
     Button mSbTicketing;
 
     private CctvFragment mCctvFragment;
@@ -140,22 +140,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Nullable
-    @OnClick({R.id.button1, R.id.button2, R.id.button3, R.id.button4})
+    @OnClick({R.id.nb_platform, R.id.nb_ticketing, R.id.sb_platform, R.id.sb_ticketing})
     void onClickButton(Button button) {
         switch (button.getId()) {
-            case R.id.button1:
+            case R.id.nb_platform:
                 changeCamera(mCurrentStationId, 1);
                 break;
 
-            case R.id.button2:
+            case R.id.nb_ticketing:
                 changeCamera(mCurrentStationId, 2);
                 break;
 
-            case R.id.button3:
+            case R.id.sb_platform:
                 changeCamera(mCurrentStationId, 3);
                 break;
 
-            case R.id.button4:
+            case R.id.sb_ticketing:
                 changeCamera(mCurrentStationId, 4);
                 break;
 

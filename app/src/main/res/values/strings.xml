@@ -6,21 +6,20 @@
 
     <string name="connection_not_available">
         Network connection not available.
-        Please check if your wifi or mobile data is enabled.
+        \nPlease check if your wifi or mobile data is enabled.
     </string>
     <string name="connection_timeout">
-        Connection timeout. Attempting to reconnect. Please wait...
-        This may be caused by poor internet connection or the system may be under maintenance.
+        Connection timeout.
+        \nReconnecting please wait...
+        \nThis may be caused by poor internet connection or the system may be under maintenance.
     </string>
     <string name="cctv_not_available">
-        CCTV camera may be temporarily not available.
-        Attempting to establish connection.
-        Please wait or check other CCTV cameras.
+        CCTV camera is not available at this time.
+        \nPlease wait or check other CCTV cameras.
     </string>
 
     <string name="nb_platform">NORTH BOUND PLATFORM</string>
     <string name="nb_ticketing">NORTH BOUND TICKETING</string>
-
     <string name="sb_platform">SOUTH BOUND PLATFORM</string>
     <string name="sb_ticketing">SOUTH BOUND TICKETING</string>
 

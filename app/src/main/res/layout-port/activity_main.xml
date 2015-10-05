@@ -45,14 +45,14 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/button1"
+                android:id="@+id/nb_platform"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="@string/nb_platform" />
 
             <Button
-                android:id="@+id/button2"
+                android:id="@+id/nb_ticketing"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
@@ -68,14 +68,14 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/button3"
+                android:id="@+id/sb_platform"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="@string/sb_platform" />
 
             <Button
-                android:id="@+id/button4"
+                android:id="@+id/sb_ticketing"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
