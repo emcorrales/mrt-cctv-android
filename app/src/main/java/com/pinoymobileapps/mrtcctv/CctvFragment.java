@@ -43,11 +43,12 @@ public class CctvFragment extends Fragment {
     private int mProgressBarVisibility;
     private int mCameraId;
     private int mStationId;
-    private boolean mIsChangingOrientation = false;
+    private boolean mHasDetached = false;
+    private boolean mIsUsingBackupApi = false;
     private Bitmap mImage;
     private ApiService mApiService;
     private Call<ResponseBody> mCaller;
-    private boolean mIsUsingStableApi = true;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -68,7 +69,7 @@ public class CctvFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (mIsChangingOrientation) {
+        if (mHasDetached) {
             restoreViewStates();
             if (mCaller == null) {
                 stream(mStationId, mCameraId);
@@ -103,7 +104,7 @@ public class CctvFragment extends Fragment {
 
     private void stream(final int stationId, final int cameraId) {
         if (isResumed()) {
-            if (mIsUsingStableApi) {
+            if (mIsUsingBackupApi) {
                 mCaller = mApiService.streamV1(stationId, cameraId);
             } else {
                 mCaller = mApiService.streamV2(stationId, cameraId);
@@ -181,7 +182,7 @@ public class CctvFragment extends Fragment {
     @Override
     public void onPause() {
         saveViewStates();
-        mIsChangingOrientation = false;
+        mHasDetached = false;
         super.onPause();
     }
 
@@ -196,7 +197,7 @@ public class CctvFragment extends Fragment {
 
     @Override
     public void onDetach() {
-        mIsChangingOrientation = true;
+        mHasDetached = true;
         super.onDetach();
     }
 
@@ -212,16 +213,25 @@ public class CctvFragment extends Fragment {
     }
 
     private void handleRequestTimeout() {
-        mIsUsingStableApi = !mIsUsingStableApi;
-        clearImage();
-        showMessage(R.string.connection_timeout);
-        stream(mStationId, mCameraId);
+        if (!mIsUsingBackupApi) {
+            mIsUsingBackupApi = true;
+        } else {
+            mIsUsingBackupApi = false;
+            clearImage();
+            showMessage(R.string.connection_timeout);
+            stream(mStationId, mCameraId);
+        }
     }
 
     private void handleCctvNotAvailable() {
-        mIsUsingStableApi = !mIsUsingStableApi;
-        clearImage();
-        showMessage(R.string.cctv_not_available);
+        if (!mIsUsingBackupApi) {
+            mIsUsingBackupApi = true;
+        } else {
+            mIsUsingBackupApi = false;
+            clearImage();
+            showMessage(R.string.cctv_not_available);
+            stream(mStationId, mCameraId);
+        }
     }
 
     private void handleNetworkNotAvailable() {
@@ -269,7 +279,7 @@ public class CctvFragment extends Fragment {
             cancelRequest();
             mStationId = stationId;
             mCameraId = cameraId;
-            mIsUsingStableApi = true;
+            mIsUsingBackupApi = false;
             clearImage();
             hideMessage();
             showProgressBar();
