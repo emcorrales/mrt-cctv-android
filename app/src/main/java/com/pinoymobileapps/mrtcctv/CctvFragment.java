@@ -230,7 +230,6 @@ public class CctvFragment extends Fragment {
             mIsUsingBackupApi = false;
             clearImage();
             showMessage(R.string.cctv_not_available);
-            stream(mStationId, mCameraId);
         }
     }
 
